@@ -18,7 +18,7 @@ To get the latest commit from GitHub
 
     pip install -e git+git://github.com/mitodl/server-status.git#egg=server_status
 
-Add a stanza like this to your settings. True means it will be checked. False means it will not be.
+Add a stanza like this to your settings. Current supported services are 'REDIS', 'ELASTIC_SEARCH', 'POSTGRES'.
 
 .. code-block:: python
 
