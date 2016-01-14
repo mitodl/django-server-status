@@ -132,17 +132,17 @@ def status(request):  # pylint: disable=unused-argument
         raise Http404()
     info = {}
 
-    if settings.HEALTH_CHECK['REDIS']:
+    if 'REDIS' in settings.HEALTH_CHECK:
         log.debug("going to get redis")
         info["redis"] = get_redis_info()
         log.debug("redis done")
 
-    if settings.HEALTH_CHECK['ELASTIC_SEARCH']:
+    if 'ELASTIC_SEARCH' in settings.HEALTH_CHECK:
         log.debug("going to get elastic search")
         info["elasticsearch"] = get_elasticsearch_info()
         log.debug("elasticsearch done")
 
-    if settings.HEALTH_CHECK['POSTGRES']:
+    if 'POSTGRES' in settings.HEALTH_CHECK:
         log.debug("getting postgres")
         info["postgresql"] = get_pg_info()
         log.debug("postgres done")

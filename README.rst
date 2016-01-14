@@ -22,11 +22,7 @@ Add a stanza like this to your settings. True means it will be checked. False me
 
 .. code-block:: python
 
-    HEALTH_CHECK = {
-        'REDIS': True,
-        'ELASTIC_SEARCH': True,
-        'POSTGRES': True,
-    }
+    HEALTH_CHECK = ['REDIS', 'ELASTIC_SEARCH', 'POSTGRES']
 
 
 Add ``server_status`` to your ``INSTALLED_APPS``

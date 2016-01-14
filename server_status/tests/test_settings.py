@@ -79,11 +79,7 @@ HAYSTACK_CONNECTIONS = {
 
 STATUS_TOKEN = 'asdf'
 
-HEALTH_CHECK = {
-    'REDIS': True,
-    'ELASTIC_SEARCH': True,
-    'POSTGRES': True,
-}
-
 BROKER_URL = 'redis://redis:6379/4'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/4'
+
+HEALTH_CHECK = ['REDIS', 'ELASTIC_SEARCH', 'POSTGRES']
