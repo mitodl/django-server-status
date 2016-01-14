@@ -1,0 +1,7 @@
+django
+six
+django-compat
+kombu
+redis
+psycopg2
+elasticsearch

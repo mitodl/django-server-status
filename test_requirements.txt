@@ -1,0 +1,14 @@
+coverage
+fabric
+flake8
+ipdb
+mixer
+mock
+tox
+django-compat
+six
+
+psycopg2
+redis
+kombu
+elasticsearch
