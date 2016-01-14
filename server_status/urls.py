@@ -1,12 +1,12 @@
 """URLs for the server_status app."""
-# from compat import patterns, url
+from compat import patterns, url
 
-# from . import views
+from . import views
 
 
-# urlpatterns = patterns(
-#     '',
-#     url(r'^$',
-#         views.YourView.as_view(),
-#         name='server_status_default'),
-# )
+urlpatterns = patterns(
+    '',
+    url(r'^$',
+        views.status,
+        name='status'),
+)
