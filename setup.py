@@ -53,7 +53,7 @@ setup(
     license='The AGPL License',
     platforms=['OS Independent'],
     keywords='django, monitoring, health check',
-    author='MIT ODL',
+    author='MIT Office of Digital Learning',
     author_email='mitx-devops@mit.edu',
     url="https://github.com/mitodl/server-status",
     packages=find_packages(),
