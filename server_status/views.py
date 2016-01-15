@@ -149,7 +149,7 @@ def status(request):  # pylint: disable=unused-argument
 
     code = HTTP_OK
     for key in info:
-        if info[key]["status"] == "down":
+        if info[key]["status"] == DOWN:
             code = SERVICE_UNAVAILABLE
             break
 
