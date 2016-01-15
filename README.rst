@@ -42,3 +42,4 @@ Add the ``server_status`` URLs to your ``urls.py``
         ...
         url(r'^status', include('server_status.urls')),
     )
+
