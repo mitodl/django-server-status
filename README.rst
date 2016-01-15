@@ -1,5 +1,5 @@
-server-status
-============
+django-server-status
+====================
 
 Monitor server status with a healthcheck.
 
@@ -10,13 +10,13 @@ To get the latest stable release from PyPi
 
 .. code-block:: bash
 
-    pip install server-status
+    pip install django-server-status
 
 To get the latest commit from GitHub
 
 .. code-block:: bash
 
-    pip install -e git+git://github.com/mitodl/server-status.git#egg=server_status
+    pip install -e git+git://github.com/mitodl/django-server-status.git#egg=django-server_status
 
 Add a stanza like this to your settings. Current supported services are 'REDIS', 'ELASTIC_SEARCH', 'POSTGRES'.
 

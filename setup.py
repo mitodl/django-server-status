@@ -46,7 +46,7 @@ def read(fname):
         return ''
 
 setup(
-    name="server-status",
+    name="django-server-status",
     version=app.__version__,
     description=read('DESCRIPTION'),
     long_description=read('README.rst'),
@@ -55,7 +55,7 @@ setup(
     keywords='django, monitoring, health check',
     author='MIT Office of Digital Learning',
     author_email='mitx-devops@mit.edu',
-    url="https://github.com/mitodl/server-status",
+    url="https://github.com/mitodl/django-server-status",
     packages=find_packages(),
     include_package_data=True,
     install_requires=install_requires,
