@@ -16,7 +16,7 @@ To get the latest commit from GitHub
 
 .. code-block:: bash
 
-    pip install -e git+git://github.com/mitodl/django-server-status.git#egg=django-server_status
+    pip install -e git+git://github.com/mitodl/django-server-status.git#egg=django-server-status
 
 Add a stanza like this to your settings. Current supported services are 'REDIS', 'ELASTIC_SEARCH', 'POSTGRES'.
 
@@ -40,6 +40,6 @@ Add the ``server_status`` URLs to your ``urls.py``
 
     urlpatterns = patterns('',
         ...
-        url(r'^status', include('server_status.urls')),
+        url(r'^status/', include('server_status.urls')),
     )
 

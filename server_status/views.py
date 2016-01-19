@@ -8,7 +8,7 @@ Notes:
 * Different services provide different information, but all should return
   UP, DOWN, or NO_CONFIG for the "status" key.
 """
-
+from __future__ import unicode_literals
 from datetime import datetime
 import logging
 
@@ -25,6 +25,7 @@ SERVICE_UNAVAILABLE = 503
 TIMEOUT_SECONDS = 5
 
 
+# pylint: disable=too-many-locals
 def get_pg_info():
     """Check PostgreSQL connection."""
     from psycopg2 import connect, OperationalError
@@ -51,9 +52,9 @@ def get_pg_info():
         log.debug("at end of context manager")
         micro = (datetime.now() - start).microseconds
         connection.close()
-    except (OperationalError, KeyError) as e:
+    except (OperationalError, KeyError) as ex:
         log.error("No redis connection info found in settings. %s Error: %s",
-                  conf, e)
+                  conf, ex)
         return {"status": DOWN}
     log.debug("got to end of postgres check successfully")
     return {"status": UP, "response_microseconds": micro}
@@ -69,15 +70,15 @@ def get_redis_info():
     )
     try:
         url = settings.BROKER_URL
-        _, host, port, _, password, db, _ = parse_redis_url(url)
-    except AttributeError as e:
-        log.error("No redis connection info found in settings. Error: %s", e)
+        _, host, port, _, password, database, _ = parse_redis_url(url)
+    except AttributeError as ex:
+        log.error("No redis connection info found in settings. Error: %s", ex)
         return {"status": NO_CONFIG}
 
     start = datetime.now()
     try:
         rdb = StrictRedis(
-            host=host, port=port, db=db,
+            host=host, port=port, db=database,
             password=password, socket_timeout=TIMEOUT_SECONDS,
         )
         info = rdb.info()
@@ -105,9 +106,9 @@ def get_elasticsearch_info():
     )
     try:
         url = settings.HAYSTACK_CONNECTIONS["default"]["URL"]
-    except (AttributeError, KeyError) as e:
+    except (AttributeError, KeyError) as ex:
         log.error("No elasticsearch connection info found in settings. "
-                  "Error: %s", e)
+                  "Error: %s", ex)
         return {"status": NO_CONFIG}
     start = datetime.now()
     try:
@@ -124,9 +125,6 @@ def get_elasticsearch_info():
 
 def status(request):  # pylint: disable=unused-argument
     """Status"""
-    # TODO(jabrahms): It would be nice if these had an interface with common
-    # methods, then we could map them to config variables and just loop over
-    # and determine status.
     token = request.GET.get("token", "")
     if token != settings.STATUS_TOKEN:
         raise Http404()
@@ -149,7 +147,7 @@ def status(request):  # pylint: disable=unused-argument
 
     code = HTTP_OK
     for key in info:
-        if info[key]["status"] == "down":
+        if info[key]["status"] == DOWN:
             code = SERVICE_UNAVAILABLE
             break
 

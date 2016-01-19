@@ -9,3 +9,6 @@ db.sqlite
 dist/
 docs/_build/
 local_settings.py
+htmlcov/
+.cache/
+.idea/

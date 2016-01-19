@@ -2,6 +2,6 @@
 language: ruby
 cache: bundler
 script:
-  - docker-compose run web
+  - docker-compose -f travis-docker-compose.yml run web tox
 services:
   - docker

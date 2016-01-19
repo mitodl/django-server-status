@@ -27,11 +27,12 @@ For more information on creating source distributions, see
 http://docs.python.org/2/distutils/sourcedist.html
 
 """
+from __future__ import unicode_literals
 import os
 from setuptools import setup, find_packages
 import server_status as app
 
-
+# pylint: disable=invalid-name
 dev_requires = [
     'flake8',
 ]
@@ -39,9 +40,10 @@ dev_requires = [
 install_requires = open('requirements.txt').read().splitlines()
 
 
-def read(fname):
+def read(filename):
+    """Helper function to read bytes from file"""
     try:
-        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+        return open(os.path.join(os.path.dirname(__file__), filename)).read()
     except IOError:
         return ''
 
