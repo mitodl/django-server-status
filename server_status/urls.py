@@ -1,12 +1,9 @@
 """URLs for the server_status app."""
-from compat import patterns, url
+from django.conf.urls import url
 
-from . import views
+from server_status import views
 
 
-urlpatterns = patterns(
-    '',
-    url(r'^$',
-        views.status,
-        name='status'),
+urlpatterns = (
+    url(r'^$', views.status, name='status'),
 )

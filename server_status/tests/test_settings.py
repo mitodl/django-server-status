@@ -1,4 +1,5 @@
 """Settings that need to be set in order to run the tests."""
+from __future__ import unicode_literals
 import os
 import logging
 

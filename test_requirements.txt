@@ -5,10 +5,8 @@ ipdb
 mixer
 mock
 tox
-django-compat
-six
-
-psycopg2
-redis
-kombu
-elasticsearch
+pytest
+pytest-pep8
+pytest-pylint
+pytest-cov
+pytest-django
