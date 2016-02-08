@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 import logging
 
+import celery
 from django.conf import settings
 from django.http import JsonResponse, Http404
 
@@ -123,27 +124,45 @@ def get_elasticsearch_info():
     }
 
 
+def get_celery_info():
+    """
+    Check celery availability
+    """
+    if not getattr(settings, 'USE_CELERY', False):
+        log.error("No celery config found. Set USE_CELERY in settings to enable.")
+        return {"status": NO_CONFIG}
+    start = datetime.now()
+    try:
+        # pylint: disable=no-member
+        celery_stats = celery.task.control.inspect().stats()
+        if not celery_stats:
+            log.error("No running Celery workers were found.")
+            return {"status": DOWN, "message": "No running Celery workers"}
+    except IOError as exp:
+        log.error("Error connecting to the backend: %s", exp)
+        return {"status": DOWN, "message": "Error connecting to the backend"}
+    return {"status": UP, "response_microseconds": (datetime.now() - start).microseconds}
+
+
 def status(request):  # pylint: disable=unused-argument
     """Status"""
     token = request.GET.get("token", "")
     if token != settings.STATUS_TOKEN:
         raise Http404()
+
     info = {}
+    check_mapping = {
+        'REDIS': (get_redis_info, 'redis'),
+        'ELASTIC_SEARCH': (get_elasticsearch_info, 'elasticsearch'),
+        'POSTGRES': (get_pg_info, 'postgresql'),
+        'CELERY': (get_celery_info, 'celery'),
+    }
 
-    if 'REDIS' in settings.HEALTH_CHECK:
-        log.debug("going to get redis")
-        info["redis"] = get_redis_info()
-        log.debug("redis done")
-
-    if 'ELASTIC_SEARCH' in settings.HEALTH_CHECK:
-        log.debug("going to get elastic search")
-        info["elasticsearch"] = get_elasticsearch_info()
-        log.debug("elasticsearch done")
-
-    if 'POSTGRES' in settings.HEALTH_CHECK:
-        log.debug("getting postgres")
-        info["postgresql"] = get_pg_info()
-        log.debug("postgres done")
+    for setting, (check_fn, key) in check_mapping.items():
+        if setting in settings.HEALTH_CHECK:
+            log.debug('getting: %s', key)
+            info[key] = check_fn()
+            log.debug('%s done', key)
 
     code = HTTP_OK
     for key in info:

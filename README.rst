@@ -18,7 +18,7 @@ To get the latest commit from GitHub
 
     pip install -e git+git://github.com/mitodl/django-server-status.git#egg=django-server-status
 
-Add a stanza like this to your settings. Current supported services are 'REDIS', 'ELASTIC_SEARCH', 'POSTGRES'.
+Add a stanza like this to your settings. Current supported services are 'REDIS', 'ELASTIC_SEARCH', 'POSTGRES', 'CELERY'.
 
 .. code-block:: python
 
@@ -43,3 +43,10 @@ Add the ``server_status`` URLs to your ``urls.py``
         url(r'^status/', include('server_status.urls')),
     )
 
+
+Release Notes
+-------------
+
+0.2: Support for celery validation.
+0.1.1: Included tests
+0.1: Initial Release

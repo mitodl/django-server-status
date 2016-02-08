@@ -6,11 +6,15 @@ from __future__ import unicode_literals
 from copy import deepcopy
 import json
 import logging
+import mock
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import Client
+from django.test.utils import override_settings
 from django.test.testcases import TestCase
+
+from server_status import views
 
 log = logging.getLogger(__name__)
 
@@ -43,10 +47,13 @@ class TestStatus(TestCase):
 
     def test_view(self):
         """Get normally."""
-        resp = self.get()
-        for key in ("postgresql", "redis", "elasticsearch"):
-            self.assertTrue(resp[key]["status"] == "up")
+        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+            mocked.return_value.stats.return_value = {'foo': 'bar'}
+            resp = self.get()
+        for key in ("postgresql", "redis", "elasticsearch", "celery"):
+            self.assertTrue(resp[key]["status"] == views.UP)
 
+    @override_settings(USE_CELERY=False)
     def test_no_settings(self):
         """Missing settings."""
         (broker_url, databases, haystack_connections) = (
@@ -59,8 +66,8 @@ class TestStatus(TestCase):
             del settings.DATABASES
             del settings.HAYSTACK_CONNECTIONS
             resp = self.get()
-            for key in ("postgresql", "redis", "elasticsearch"):
-                self.assertTrue(resp[key]["status"] == "no config found")
+            for key in ("postgresql", "redis", "elasticsearch", "celery"):
+                self.assertTrue(resp[key]["status"] == views.NO_CONFIG)
         finally:
             (
                 settings.BROKER_URL,
@@ -83,7 +90,7 @@ class TestStatus(TestCase):
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("postgresql", "redis", "elasticsearch"):
-                self.assertTrue(resp[key]["status"] == "down",
+                self.assertTrue(resp[key]["status"] == views.DOWN,
                                 "%s - %s" % (key, resp[key]))
 
     def test_invalid_settings(self):
@@ -102,7 +109,7 @@ class TestStatus(TestCase):
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("postgresql", "redis", "elasticsearch"):
-                self.assertTrue(resp[key]["status"] == "down")
+                self.assertTrue(resp[key]["status"] == views.DOWN)
 
     def test_token(self):
         """
@@ -117,3 +124,23 @@ class TestStatus(TestCase):
         # Invalid token.
         resp = self.client.get(self.url, {"token": "gibberish"})
         self.assertEqual(resp.status_code, 404, resp.content)
+
+    def test_celery_errors(self):
+        """
+        Specific test for celery errors
+        """
+        # no answer in the stats call
+        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+            mocked.return_value.stats.return_value = {}
+            resp = self.get(503)
+        self.assertIn("celery", resp)
+        self.assertIn("status", resp["celery"])
+        self.assertEqual(resp["celery"]["status"], views.DOWN)
+
+        # exception in the stats call
+        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+            mocked.side_effect = IOError()
+            resp = self.get(503)
+        self.assertIn("celery", resp)
+        self.assertIn("status", resp["celery"])
+        self.assertEqual(resp["celery"]["status"], views.DOWN)
