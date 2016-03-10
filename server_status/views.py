@@ -165,10 +165,14 @@ def status(request):  # pylint: disable=unused-argument
             log.debug('%s done', key)
 
     code = HTTP_OK
+    status_all = UP
     for key in info:
         if info[key]["status"] == DOWN:
             code = SERVICE_UNAVAILABLE
+            status_all = DOWN
             break
+
+    info["status_all"] = status_all
 
     resp = JsonResponse(info)
     resp.status_code = code

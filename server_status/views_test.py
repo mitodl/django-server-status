@@ -53,6 +53,8 @@ class TestStatus(TestCase):
         for key in ("postgresql", "redis", "elasticsearch", "celery"):
             self.assertTrue(resp[key]["status"] == views.UP)
 
+        self.assertTrue(resp["status_all"] == views.UP)
+
     @override_settings(USE_CELERY=False)
     def test_no_settings(self):
         """Missing settings."""
@@ -144,3 +146,14 @@ class TestStatus(TestCase):
         self.assertIn("celery", resp)
         self.assertIn("status", resp["celery"])
         self.assertEqual(resp["celery"]["status"], views.DOWN)
+
+    def test_status_all(self):
+        """
+        Test that status_all is DOWN when another service is DOWN
+        """
+        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+            mocked.return_value.stats.return_value = {}
+            resp = self.get(503)
+
+        self.assertIn("status_all", resp)
+        self.assertEqual(resp["status_all"], views.DOWN)
