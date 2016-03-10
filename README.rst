@@ -47,6 +47,7 @@ Add the ``server_status`` URLs to your ``urls.py``
 Release Notes
 -------------
 
+0.3: Added status_all property to the status results JSON.
 0.2: Support for celery validation.
 0.1.1: Included tests
 0.1: Initial Release
