@@ -13,7 +13,7 @@ elastic:
     - "9200"
 web:
   build: .
-  command: '/bin/bash -c "./test.sh"'
+  command: 'tox'
   volumes:
     - .:/src
   links:

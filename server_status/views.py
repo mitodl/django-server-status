@@ -147,7 +147,7 @@ def get_celery_info():
 def status(request):  # pylint: disable=unused-argument
     """Status"""
     token = request.GET.get("token", "")
-    if token != settings.STATUS_TOKEN:
+    if not token or token != settings.STATUS_TOKEN:
         raise Http404()
 
     info = {}

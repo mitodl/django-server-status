@@ -125,6 +125,14 @@ class TestStatus(TestCase):
         resp = self.client.get(self.url, {"token": "gibberish"})
         self.assertEqual(resp.status_code, 404, resp.content)
 
+    @override_settings(STATUS_TOKEN="")
+    def test_empty_token(self):
+        """
+        An empty token should not work even if it matches the setting.
+        """
+        resp = self.client.get(self.url, {"token": ""})
+        self.assertEqual(resp.status_code, 404, resp.content)
+
     def test_celery_errors(self):
         """
         Specific test for celery errors
