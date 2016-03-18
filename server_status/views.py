@@ -138,7 +138,7 @@ def get_celery_info():
         if not celery_stats:
             log.error("No running Celery workers were found.")
             return {"status": DOWN, "message": "No running Celery workers"}
-    except IOError as exp:
+    except Exception as exp:  # pylint: disable=broad-except
         log.error("Error connecting to the backend: %s", exp)
         return {"status": DOWN, "message": "Error connecting to the backend"}
     return {"status": UP, "response_microseconds": (datetime.now() - start).microseconds}
