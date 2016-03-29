@@ -38,10 +38,10 @@ Add the ``server_status`` URLs to your ``urls.py``
 
 .. code-block:: python
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         ...
         url(r'^status/', include('server_status.urls')),
-    )
+    ]
 
 
 Release Notes
