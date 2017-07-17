@@ -4,9 +4,12 @@ flake8
 ipdb
 mixer
 mock
-tox
+pdbpp
+pylint-django==0.7.2
+pylint==1.7.1
 pytest
-pytest-pep8
-pytest-pylint
 pytest-cov
 pytest-django
+pytest-pep8
+pytest-pylint==0.6.0
+tox
