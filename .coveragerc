@@ -1,0 +1,17 @@
+[run]
+branch = True
+source = .
+data_file=/tmp/coverage
+omit =
+    manage.py
+    ./.tox/*
+    */migrations/*
+    *_test.py
+    *_tests.py
+    ./selenium_tests/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+show_missing = True
+precision = 2
