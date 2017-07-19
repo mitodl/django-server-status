@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 import logging
 
-import celery
 from django.conf import settings
 from django.http import JsonResponse, Http404
 
@@ -69,12 +68,14 @@ def get_redis_info():
         ConnectionError as RedisConnectionError,
         ResponseError as RedisResponseError,
     )
-    try:
-        url = settings.BROKER_URL
-        _, host, port, _, password, database, _ = parse_redis_url(url)
-    except AttributeError as ex:
-        log.error("No redis connection info found in settings. Error: %s", ex)
+    for conf_name in ('CELERY_BROKER_URL', 'BROKER_URL', 'REDIS_URL', ):
+        if hasattr(settings, conf_name):
+            url = getattr(settings, conf_name)
+            break
+    else:
+        log.error("No redis connection info found in settings.")
         return {"status": NO_CONFIG}
+    _, host, port, _, password, database, _ = parse_redis_url(url)
 
     start = datetime.now()
     try:
@@ -105,11 +106,9 @@ def get_elasticsearch_info():
         Elasticsearch,
         ConnectionError as ESConnectionError
     )
-    try:
-        url = settings.HAYSTACK_CONNECTIONS["default"]["URL"]
-    except (AttributeError, KeyError) as ex:
-        log.error("No elasticsearch connection info found in settings. "
-                  "Error: %s", ex)
+    if hasattr(settings, 'ELASTICSEARCH_URL'):
+        url = settings.ELASTICSEARCH_URL
+    else:
         return {"status": NO_CONFIG}
     start = datetime.now()
     try:
@@ -128,6 +127,7 @@ def get_celery_info():
     """
     Check celery availability
     """
+    import celery
     if not getattr(settings, 'USE_CELERY', False):
         log.error("No celery config found. Set USE_CELERY in settings to enable.")
         return {"status": NO_CONFIG}

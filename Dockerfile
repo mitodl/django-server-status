@@ -1,4 +1,4 @@
-FROM python:3.4
+FROM python:3.6
 MAINTAINER ODL DevOps <mitx-devops@mit.edu>
 
 # Add package files
@@ -15,10 +15,10 @@ RUN adduser --disabled-password --gecos "" mitodl
 COPY requirements.txt /tmp/requirements.txt
 COPY test_requirements.txt /tmp/test_requirements.txt
 
-RUN pip install -r requirements.txt
-RUN pip install -r test_requirements.txt
-RUN pip3 install -r requirements.txt
-RUN pip3 install -r test_requirements.txt
+RUN pip install -U pip
+RUN pip3 install -U pip
+RUN pip install -r requirements.txt -r test_requirements.txt
+RUN pip3 install -r requirements.txt -r test_requirements.txt
 
 # Add project
 COPY . /src

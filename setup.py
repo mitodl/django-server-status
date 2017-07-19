@@ -47,6 +47,7 @@ def read(filename):
     except IOError:
         return ''
 
+
 setup(
     name="django-server-status",
     version=app.__version__,

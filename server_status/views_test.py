@@ -55,18 +55,36 @@ class TestStatus(TestCase):
 
         self.assertTrue(resp["status_all"] == views.UP)
 
+    @override_settings(HEALTH_CHECK=['REDIS'])
+    def test_redis_with_different_names(self):
+        """
+        Redis configuration can be called in different names
+        """
+        # remove the default one that should be in the settings (it should be tested in test_view)
+        assert hasattr(settings, 'BROKER_URL')
+        assert not hasattr(settings, 'CELERY_BROKER_URL')
+        assert not hasattr(settings, 'REDIS_URL')
+        redis_url = settings.BROKER_URL
+        del settings.BROKER_URL
+        with override_settings(CELERY_BROKER_URL=redis_url):
+            resp = self.get()
+            assert resp['redis']["status"] == views.UP
+        with override_settings(REDIS_URL=redis_url):
+            resp = self.get()
+            assert resp['redis']["status"] == views.UP
+
     @override_settings(USE_CELERY=False)
     def test_no_settings(self):
         """Missing settings."""
-        (broker_url, databases, haystack_connections) = (
+        (broker_url, databases, elastic_connections) = (
             settings.BROKER_URL,
             settings.DATABASES,
-            settings.HAYSTACK_CONNECTIONS
+            settings.ELASTICSEARCH_URL
         )
         try:
             del settings.BROKER_URL
             del settings.DATABASES
-            del settings.HAYSTACK_CONNECTIONS
+            del settings.ELASTICSEARCH_URL
             resp = self.get()
             for key in ("postgresql", "redis", "elasticsearch", "celery"):
                 self.assertTrue(resp[key]["status"] == views.NO_CONFIG)
@@ -74,21 +92,18 @@ class TestStatus(TestCase):
             (
                 settings.BROKER_URL,
                 settings.DATABASES,
-                settings.HAYSTACK_CONNECTIONS,
-            ) = (broker_url, databases, haystack_connections)
+                settings.ELASTICSEARCH_URL,
+            ) = (broker_url, databases, elastic_connections)
 
     def test_broken_settings(self):
         """Settings that couldn't possibly work."""
         junk = " not a chance "
-        broker_url = junk
         databases = deepcopy(settings.DATABASES)
         databases['default'] = junk
-        haystack_connections = deepcopy(settings.HAYSTACK_CONNECTIONS)
-        haystack_connections["default"]["URL"] = junk
         with self.settings(
-            BROKER_URL=broker_url,
+            BROKER_URL=junk,
             DATABASES=databases,
-            HAYSTACK_CONNECTIONS=haystack_connections,
+            ELASTICSEARCH_URL=junk,
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("postgresql", "redis", "elasticsearch"):
@@ -99,15 +114,12 @@ class TestStatus(TestCase):
         """
         Settings that look right, but aren't (if service is actually down).
         """
-        broker_url = "redis://bogus:6379/4"
         databases = deepcopy(settings.DATABASES)
         databases["default"]["HOST"] = "monkey"
-        haystack_connections = deepcopy(settings.HAYSTACK_CONNECTIONS)
-        haystack_connections["default"]["URL"] = "pizza:2300"
         with self.settings(
-            BROKER_URL=broker_url,
+            BROKER_URL="redis://bogus:6379/4",
             DATABASES=databases,
-            HAYSTACK_CONNECTIONS=haystack_connections
+            ELASTICSEARCH_URL="pizza:2300"
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("postgresql", "redis", "elasticsearch"):

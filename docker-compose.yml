@@ -1,22 +1,28 @@
-db:
-  image: postgres
-  ports:
-    - "5432"
-redis:
-  image: redis
-  ports:
-    - "6379"
-elastic:
-  image: elasticsearch
-  command: elasticsearch -Des.network.host=0.0.0.0
-  ports:
-    - "9200"
-web:
-  build: .
-  command: 'tox'
-  volumes:
-    - .:/src
-  links:
-    - db
-    - redis
-    - elastic
+version: "2.1"
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432"
+  redis:
+    image: redis
+    ports:
+      - "6379"
+  elastic:
+    image: elasticsearch:2.4.1
+    command: elasticsearch -Des.network.host=0.0.0.0 -Des.http.cors.enabled=true -Des.http.cors.allow-origin=*
+    ports:
+      - "9200"
+  web:
+    build: .
+    command: 'tox'
+    volumes:
+      - .:/src
+    environment:
+      DATABASE_HOST: db
+      BROKER_URL: redis://redis:6379/4
+      ELASTICSEARCH_URL: http://elastic:9200
+    links:
+      - db
+      - redis
+      - elastic
