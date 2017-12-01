@@ -53,7 +53,7 @@ def get_pg_info():
         micro = (datetime.now() - start).microseconds
         connection.close()
     except (OperationalError, KeyError) as ex:
-        log.error("No redis connection info found in settings. %s Error: %s",
+        log.error("No PostgreSQL connection info found in settings. %s Error: %s",
                   conf, ex)
         return {"status": DOWN}
     log.debug("got to end of postgres check successfully")
