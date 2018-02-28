@@ -1,9 +1,10 @@
-sudo: false
+sudo: required
 language: python
 services:
   - postgresql
   - elasticsearch
   - redis-server
+  - rabbitmq
 install:
   - pip install -U pip setuptools
   - pip install tox-travis

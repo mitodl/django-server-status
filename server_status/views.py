@@ -68,10 +68,11 @@ def get_redis_info():
         ConnectionError as RedisConnectionError,
         ResponseError as RedisResponseError,
     )
-    for conf_name in ('CELERY_BROKER_URL', 'BROKER_URL', 'REDIS_URL', ):
+    for conf_name in ('REDIS_URL', 'BROKER_URL', 'CELERY_BROKER_URL'):
         if hasattr(settings, conf_name):
             url = getattr(settings, conf_name)
-            break
+            if url.startswith('redis://'):
+                break
     else:
         log.error("No redis connection info found in settings.")
         return {"status": NO_CONFIG}

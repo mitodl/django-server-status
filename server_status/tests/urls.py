@@ -1,5 +1,9 @@
 """URLs to run the tests."""
-from django.conf.urls import include, url
+try:
+    from django.urls import include
+except ImportError:
+    from django.conf.urls import include
+from django.conf.urls import url
 from django.contrib import admin
 
 admin.autodiscover()

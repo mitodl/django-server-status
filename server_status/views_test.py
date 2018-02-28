@@ -68,7 +68,6 @@ class TestStatus(TestCase):
         """
         # remove the default one that should be in the settings (it should be tested in test_view)
         assert hasattr(settings, 'BROKER_URL')
-        assert not hasattr(settings, 'CELERY_BROKER_URL')
         assert not hasattr(settings, 'REDIS_URL')
         redis_url = settings.BROKER_URL
         del settings.BROKER_URL
@@ -82,12 +81,14 @@ class TestStatus(TestCase):
     @override_settings(USE_CELERY=False)
     def test_no_settings(self):
         """Missing settings."""
-        (broker_url, databases, elastic_connections) = (
+        (celery_broker_url, broker_url, databases, elastic_connections) = (
+            settings.CELERY_BROKER_URL,
             settings.BROKER_URL,
             settings.DATABASES,
             settings.ELASTICSEARCH_URL
         )
         try:
+            del settings.CELERY_BROKER_URL
             del settings.BROKER_URL
             del settings.DATABASES
             del settings.ELASTICSEARCH_URL
@@ -96,10 +97,11 @@ class TestStatus(TestCase):
                 self.assertTrue(resp[key]["status"] == views.NO_CONFIG)
         finally:
             (
+                settings.CELERY_BROKER_URL,
                 settings.BROKER_URL,
                 settings.DATABASES,
                 settings.ELASTICSEARCH_URL,
-            ) = (broker_url, databases, elastic_connections)
+            ) = (celery_broker_url, broker_url, databases, elastic_connections)
 
     def test_broken_settings(self):
         """Settings that couldn't possibly work."""
@@ -107,12 +109,13 @@ class TestStatus(TestCase):
         databases = deepcopy(settings.DATABASES)
         databases['default'] = junk
         with self.settings(
-            BROKER_URL=junk,
+            CELERY_BROKER_URL=junk,
+            REDIS_URL='redis://{}'.format(junk),
             DATABASES=databases,
             ELASTICSEARCH_URL=junk,
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
-            for key in ("postgresql", "redis", "elasticsearch"):
+            for key in ("celery", "postgresql", "redis", "elasticsearch"):
                 self.assertTrue(resp[key]["status"] == views.DOWN,
                                 "%s - %s" % (key, resp[key]))
 
