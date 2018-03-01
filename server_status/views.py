@@ -134,6 +134,13 @@ def get_celery_info():
     start = datetime.now()
     try:
         # pylint: disable=no-member
+        app = celery.Celery('tasks')
+        app.config_from_object('django.conf:settings', namespace='CELERY')
+        # Make sure celery is connected with max_retries=1
+        # and not the default of max_retries=None if the connection
+        # is made lazily
+        app.connection().ensure_connection(max_retries=1)
+
         celery_stats = celery.task.control.inspect().stats()
         if not celery_stats:
             log.error("No running Celery workers were found.")

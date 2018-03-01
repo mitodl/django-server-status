@@ -9,12 +9,14 @@ import logging
 import mock
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+
 from django.test import Client
 from django.test.utils import override_settings
 from django.test.testcases import TestCase
+from django.urls import reverse
 
 from server_status import views
+
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +49,11 @@ class TestStatus(TestCase):
 
     def test_view(self):
         """Get normally."""
-        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+        with mock.patch(
+            'celery.task.control.inspect', autospec=True,
+        ) as mocked, mock.patch(
+            'celery.Celery', autospec=True
+        ):
             mocked.return_value.stats.return_value = {'foo': 'bar'}
             resp = self.get()
         for key in ("postgresql", "redis", "elasticsearch", "celery"):

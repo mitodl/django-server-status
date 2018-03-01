@@ -1,7 +1,7 @@
 django-server-status
 ====================
 
-Monitor server status with a healthcheck.
+Monitor server status with a healthcheck. Supports Django 1.10, 1.11 and 2.0.
 
 Installation
 ------------
