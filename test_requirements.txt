@@ -5,8 +5,8 @@ ipdb
 mixer
 mock
 pdbpp
-pylint-django==0.7.2
-pylint==1.7.1
+pylint-django
+pylint==1.8.2
 pytest
 pytest-cov
 pytest-django
