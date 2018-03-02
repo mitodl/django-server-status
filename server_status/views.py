@@ -68,10 +68,11 @@ def get_redis_info():
         ConnectionError as RedisConnectionError,
         ResponseError as RedisResponseError,
     )
-    for conf_name in ('CELERY_BROKER_URL', 'BROKER_URL', 'REDIS_URL', ):
+    for conf_name in ('REDIS_URL', 'BROKER_URL', 'CELERY_BROKER_URL'):
         if hasattr(settings, conf_name):
             url = getattr(settings, conf_name)
-            break
+            if url.startswith('redis://'):
+                break
     else:
         log.error("No redis connection info found in settings.")
         return {"status": NO_CONFIG}
@@ -134,6 +135,13 @@ def get_celery_info():
     start = datetime.now()
     try:
         # pylint: disable=no-member
+        app = celery.Celery('tasks')
+        app.config_from_object('django.conf:settings', namespace='CELERY')
+        # Make sure celery is connected with max_retries=1
+        # and not the default of max_retries=None if the connection
+        # is made lazily
+        app.connection().ensure_connection(max_retries=1)
+
         celery_stats = celery.task.control.inspect().stats()
         if not celery_stats:
             log.error("No running Celery workers were found.")

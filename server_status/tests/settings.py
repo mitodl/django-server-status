@@ -88,7 +88,8 @@ ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL', 'http://127.0.0.1:9200')
 USE_CELERY = True
 STATUS_TOKEN = 'asdf'
 
-BROKER_URL = os.environ.get('BROKER_URL', 'redis://127.0.0.1:6379/4')
+BROKER_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/4')
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@127.0.0.1:5672/')
 CELERY_RESULT_BACKEND = BROKER_URL
 
 HEALTH_CHECK = ['REDIS', 'ELASTIC_SEARCH', 'POSTGRES', 'CELERY']

@@ -13,6 +13,10 @@ services:
     command: elasticsearch -Des.network.host=0.0.0.0 -Des.http.cors.enabled=true -Des.http.cors.allow-origin=*
     ports:
       - "9200"
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672"
   web:
     build: .
     command: 'tox'
@@ -20,8 +24,9 @@ services:
       - .:/src
     environment:
       DATABASE_HOST: db
-      BROKER_URL: redis://redis:6379/4
+      REDIS_URL: redis://redis:6379/4
       ELASTICSEARCH_URL: http://elastic:9200
+      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672/
     links:
       - db
       - redis
