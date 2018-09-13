@@ -7,6 +7,7 @@ from copy import deepcopy
 import json
 import logging
 import mock
+from ddt import ddt, data, unpack
 
 from django.conf import settings
 
@@ -24,6 +25,7 @@ HTTP_OK = 200
 SERVICE_UNAVAILABLE = 503
 
 
+@ddt
 class TestStatus(TestCase):
     """Test output of status page."""
 
@@ -60,6 +62,32 @@ class TestStatus(TestCase):
             self.assertTrue(resp[key]["status"] == views.UP)
 
         self.assertTrue(resp["status_all"] == views.UP)
+
+    @data(
+        (None, views.DOWN, SERVICE_UNAVAILABLE),
+        (
+            "-----BEGIN CERTIFICATE-----MITX-----END CERTIFICATE-----",
+            views.DOWN,
+            SERVICE_UNAVAILABLE
+        )
+    )
+    @unpack
+    @override_settings(HEALTH_CHECK=['CERTIFICATE'])
+    def test_certificate_status_fail(self, certificate_loc, certificate_status, expected_status):
+        """
+        test app certificate expiry status.
+        """
+        with override_settings(MIT_WS_CERTIFICATE=certificate_loc):
+            resp = self.get(expected_status=expected_status)
+            assert resp['certificate']["status"] == certificate_status
+
+    def test_status_without_certificate(self):
+        """
+        test app when certificate path in not available in settings.
+        """
+        del settings.MIT_WS_CERTIFICATE
+        resp = self.get(expected_status=SERVICE_UNAVAILABLE)
+        assert 'certificate' not in resp
 
     @override_settings(HEALTH_CHECK=['REDIS'])
     def test_redis_with_different_names(self):

@@ -93,7 +93,7 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@127.
 CELERY_RESULT_BACKEND = BROKER_URL
 
 HEALTH_CHECK = ['REDIS', 'ELASTIC_SEARCH', 'POSTGRES', 'CELERY']
-
+MIT_WS_CERTIFICATE = "-----BEGIN CERTIFICATE-----MITX-----END CERTIFICATE-----"
 
 django_version = django.get_version()  # pylint: disable=invalid-name
 if StrictVersion(django_version) < StrictVersion('1.7'):

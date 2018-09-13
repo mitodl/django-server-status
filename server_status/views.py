@@ -9,8 +9,10 @@ Notes:
   UP, DOWN, or NO_CONFIG for the "status" key.
 """
 from __future__ import unicode_literals
+import os
 from datetime import datetime
 import logging
+import OpenSSL.crypto
 
 from django.conf import settings
 from django.http import JsonResponse, Http404
@@ -152,6 +154,39 @@ def get_celery_info():
     return {"status": UP, "response_microseconds": (datetime.now() - start).microseconds}
 
 
+def get_certificate_info():
+    """
+    checks app certificate expiry status
+    """
+    mit_ws_certificate = os.environ.get('MIT_WS_CERTIFICATE', None)
+    certificate_status = {
+        'app_cert_expires': '',
+        'status': DOWN
+    }
+    if not mit_ws_certificate:
+        return certificate_status
+
+    certificate = (
+        mit_ws_certificate if not isinstance(mit_ws_certificate, str)
+        else mit_ws_certificate.encode().decode('unicode_escape').encode()
+    )
+    app_cert = OpenSSL.crypto.load_certificate(
+        OpenSSL.crypto.FILETYPE_PEM,
+        certificate
+    )
+    app_cert_expiration = datetime.strptime(
+        app_cert.get_notAfter().decode('ascii'),
+        '%Y%m%d%H%M%SZ'
+    )
+    date_delta = app_cert_expiration - datetime.now()
+    certificate_status['app_cert_expires'] = (
+        app_cert_expiration.strftime('%Y-%m-%dT%H:%M:%S')
+    )
+    # if more then 30 days left in expiry of certificate then app is safe
+    certificate_status['status'] = UP if date_delta.days > 30 else DOWN
+    return certificate_status
+
+
 def status(request):  # pylint: disable=unused-argument
     """Status"""
     token = request.GET.get("token", "")
@@ -164,6 +199,7 @@ def status(request):  # pylint: disable=unused-argument
         'ELASTIC_SEARCH': (get_elasticsearch_info, 'elasticsearch'),
         'POSTGRES': (get_pg_info, 'postgresql'),
         'CELERY': (get_celery_info, 'celery'),
+        'CERTIFICATE': (get_certificate_info, 'certificate'),
     }
 
     for setting, (check_fn, key) in check_mapping.items():
