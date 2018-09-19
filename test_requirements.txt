@@ -2,6 +2,7 @@ coverage
 ddt
 fabric
 flake8
+freezegun
 ipdb
 mixer
 mock
