@@ -6,7 +6,9 @@ from __future__ import unicode_literals
 from copy import deepcopy
 import json
 import logging
+from freezegun import freeze_time
 import mock
+from ddt import ddt, data
 
 from django.conf import settings
 
@@ -24,6 +26,7 @@ HTTP_OK = 200
 SERVICE_UNAVAILABLE = 503
 
 
+@ddt
 class TestStatus(TestCase):
     """Test output of status page."""
 
@@ -60,6 +63,38 @@ class TestStatus(TestCase):
             self.assertTrue(resp[key]["status"] == views.UP)
 
         self.assertTrue(resp["status_all"] == views.UP)
+
+    @freeze_time("3000-01-14")
+    @override_settings(HEALTH_CHECK=['CERTIFICATE'])
+    def test_certificate_status_fail(self):
+        """
+        test when app certificate is expire.
+        datetime.now() == 3000-01-14
+        app_cert_expires == 2019-09-18T12:59:16
+        """
+        resp = self.get(expected_status=SERVICE_UNAVAILABLE)
+        assert resp['certificate']["status"] == views.DOWN
+
+    @freeze_time("2018-01-14")
+    @override_settings(HEALTH_CHECK=['CERTIFICATE'])
+    def test_certificate_status_pass(self):
+        """
+        test when app certificate is not expire.
+        datetime.now() == 2018-01-14
+        app_cert_expires == 2019-09-18T12:59:16
+        """
+        resp = self.get(expected_status=HTTP_OK)
+        assert resp['certificate']["status"] == views.UP
+
+    @data(None, "")
+    @override_settings(HEALTH_CHECK=['CERTIFICATE'])
+    def test_status_invalid_certificate(self, certificate):
+        """
+        test status when app certificate in not valid.
+        """
+        with override_settings(MIT_WS_CERTIFICATE=certificate):
+            resp = self.get(expected_status=HTTP_OK)
+            assert resp['certificate']["status"] == views.NO_CONFIG
 
     @override_settings(HEALTH_CHECK=['REDIS'])
     def test_redis_with_different_names(self):
