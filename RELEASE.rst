@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.6.0
+-------------
+
+- Update __init__.py
+- Added application certificate health check (#34)
+
 Version 0.5.0
 -------------
 
