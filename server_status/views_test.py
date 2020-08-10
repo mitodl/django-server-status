@@ -53,7 +53,7 @@ class TestStatus(TestCase):
     def test_view(self):
         """Get normally."""
         with mock.patch(
-            'celery.task.control.inspect', autospec=True,
+                'celery.task.control.inspect', autospec=True,
         ) as mocked, mock.patch(
             'celery.Celery', autospec=True
         ):
@@ -144,10 +144,10 @@ class TestStatus(TestCase):
         databases = deepcopy(settings.DATABASES)
         databases['default'] = junk
         with self.settings(
-            CELERY_BROKER_URL=junk,
-            REDIS_URL='redis://{}'.format(junk),
-            DATABASES=databases,
-            ELASTICSEARCH_URL=junk,
+                CELERY_BROKER_URL=junk,
+                REDIS_URL='redis://{}'.format(junk),
+                DATABASES=databases,
+                ELASTICSEARCH_URL=junk,
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("celery", "postgresql", "redis", "elasticsearch"):
@@ -161,9 +161,9 @@ class TestStatus(TestCase):
         databases = deepcopy(settings.DATABASES)
         databases["default"]["HOST"] = "monkey"
         with self.settings(
-            BROKER_URL="redis://bogus:6379/4",
-            DATABASES=databases,
-            ELASTICSEARCH_URL="pizza:2300"
+                BROKER_URL="redis://bogus:6379/4",
+                DATABASES=databases,
+                ELASTICSEARCH_URL="pizza:2300"
         ):
             resp = self.get(SERVICE_UNAVAILABLE)
             for key in ("postgresql", "redis", "elasticsearch"):
