@@ -13,14 +13,16 @@ before_script:
   - psql -c 'create database test_postgres;' -U postgres
 matrix:
   include:
-    - python: 2.7
-      env: TOX_ENV=django110
-    - python: 2.7
-      env: TOX_ENV=django111
-    - python: 3.6
-      env: TOX_ENV=django110
-    - python: 3.6
-      env: TOX_ENV=django111
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=django20
+    - python: 3.7
+      env: TOX_ENV=django30
+    - python: 3.7
+      env: TOX_ENV=django40
+    - python: 3.8
+      env: TOX_ENV=django20
+    - python: 3.8
+      env: TOX_ENV=django30
+    - python: 3.8
+      env: TOX_ENV=django40
 script: tox -e $TOX_ENV
