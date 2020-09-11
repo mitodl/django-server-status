@@ -54,8 +54,8 @@ def get_pg_info():
         micro = (datetime.now() - start).microseconds
         connection.close()
     except (OperationalError, KeyError) as ex:
-        log.error("No PostgreSQL connection info found in settings. %s Error: %s",
-                  conf, ex)
+        log.error("No PostgreSQL connection info found in settings. Error: %s",
+                  ex)
         return {"status": DOWN}
     log.debug("got to end of postgres check successfully")
     return {"status": UP, "response_microseconds": micro}
