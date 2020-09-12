@@ -26,7 +26,7 @@ SERVICE_UNAVAILABLE = 503
 TIMEOUT_SECONDS = 5
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, import-outside-toplevel
 def get_pg_info():
     """Check PostgreSQL connection."""
     from psycopg2 import connect, OperationalError
@@ -200,7 +200,7 @@ def status(request):  # pylint: disable=unused-argument
     for setting, (check_fn, key) in check_mapping.items():
         if setting in settings.HEALTH_CHECK:
             log.debug('getting: %s', key)
-            info[key] = check_fn()
+            info[key] = check_fn()  # pylint: disable=not-callable
             log.debug('%s done', key)
 
     code = HTTP_OK

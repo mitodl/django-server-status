@@ -33,10 +33,6 @@ from setuptools import setup, find_packages
 import server_status as app
 
 # pylint: disable=invalid-name
-dev_requires = [
-    'flake8',
-]
-
 install_requires = open('requirements.txt').read().splitlines()
 
 
@@ -61,8 +57,5 @@ setup(
     url="https://github.com/mitodl/django-server-status",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=install_requires,
-    extras_require={
-        'dev': dev_requires,
-    },
+    install_requires=["django"] + install_requires,
 )
