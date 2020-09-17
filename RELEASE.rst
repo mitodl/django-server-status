@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.7.0
+-------------
+
+- Modified output of error log
+- Update django-server-status to fix deprecation warnings (#37)
+
 Version 0.6.0 (Released September 24, 2018)
 -------------
 
