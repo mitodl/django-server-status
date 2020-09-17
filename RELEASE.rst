@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.7.1
+-------------
+
+- Remove comment which is incorrectly parsed (#41)
+
 Version 0.7.0 (Released September 17, 2020)
 -------------
 
