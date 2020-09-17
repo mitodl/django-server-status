@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.7.0
+Version 0.7.0 (Released September 17, 2020)
 -------------
 
 - Modified output of error log
