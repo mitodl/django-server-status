@@ -53,7 +53,7 @@ setup(
     name="django-server-status",
     version=app.__version__,
     description=read('DESCRIPTION'),
-    long_description=read('README.rst', is_restructured_text=True),
+    long_description="",  # temporarily removed, but it would be located at README.rst
     license='The AGPL License',
     platforms=['OS Independent'],
     keywords='django, monitoring, health check',
