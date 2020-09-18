@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.7.3
+Version 0.7.3 (Released September 18, 2020)
 -------------
 
 - Remove long_description from package (#46)
