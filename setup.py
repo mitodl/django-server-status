@@ -36,10 +36,15 @@ import server_status as app
 install_requires = open('requirements.txt').read().splitlines()
 
 
-def read(filename):
+def read(filename, is_restructured_text=False):
     """Helper function to read bytes from file"""
     try:
-        return open(os.path.join(os.path.dirname(__file__), filename)).read()
+        text = open(os.path.join(os.path.dirname(__file__), filename)).read()
+        if is_restructured_text:
+            # See https://packaging.python.org/specifications/core-metadata/#description
+            # any newline has to be suffixed by 7 spaces and a pipe character
+            text = text.replace("\n", "\n       |")
+        return text
     except IOError:
         return ''
 
@@ -48,7 +53,7 @@ setup(
     name="django-server-status",
     version=app.__version__,
     description=read('DESCRIPTION'),
-    long_description=read('README.rst'),
+    long_description=read('README.rst', is_restructured_text=True),
     license='The AGPL License',
     platforms=['OS Independent'],
     keywords='django, monitoring, health check',
