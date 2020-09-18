@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.7.2
+Version 0.7.2 (Released September 18, 2020)
 -------------
 
 - Fix description handling for packaging (#43)
