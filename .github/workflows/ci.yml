@@ -64,7 +64,7 @@ jobs:
         run: pylint ./**/*.py
 
       - name: Tests
-        run: tox && coverage xml
+        run: tox -- --ignore=build && coverage xml
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1
