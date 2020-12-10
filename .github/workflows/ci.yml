@@ -66,9 +66,8 @@ jobs:
       - name: Tests
         run: tox -- --ignore=build && coverage xml
         env:
-          DATABASE_HOST: db
-          REDIS_URL: redis://redis:6379/4
-          ELASTICSEARCH_URL: http://elastic:9200
+          REDIS_URL: redis://localhost:6379/4
+          ELASTICSEARCH_URL: http://localhost:9200
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1
