@@ -64,8 +64,9 @@ jobs:
         run: pylint ./**/*.py
 
       - name: Tests
-        run: tox -- --ignore=build && coverage xml
+        run: sleep 3; tox -- --ignore=build && coverage xml
         env:
+          DATABASE_HOST: localhost
           REDIS_URL: redis://localhost:6379/4
           ELASTICSEARCH_URL: http://localhost:9200
 
