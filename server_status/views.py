@@ -141,7 +141,7 @@ def get_celery_info():
         # is made lazily
         app.connection().ensure_connection(max_retries=1)
 
-        celery_stats = celery.task.control.inspect().stats()
+        celery_stats = celery.app.control.inspect().stats()
         if not celery_stats:
             log.error("No running Celery workers were found.")
             return {"status": DOWN, "message": "No running Celery workers"}

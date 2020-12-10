@@ -53,7 +53,7 @@ class TestStatus(TestCase):
     def test_view(self):
         """Get normally."""
         with mock.patch(
-                'celery.task.control.inspect', autospec=True,
+                'celery.app.control.inspect', autospec=True,
         ) as mocked, mock.patch(
             'celery.Celery', autospec=True
         ):
@@ -196,7 +196,7 @@ class TestStatus(TestCase):
         Specific test for celery errors
         """
         # no answer in the stats call
-        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+        with mock.patch('celery.app.control.inspect', autospec=True) as mocked:
             mocked.return_value.stats.return_value = {}
             resp = self.get(503)
         self.assertIn("celery", resp)
@@ -204,7 +204,7 @@ class TestStatus(TestCase):
         self.assertEqual(resp["celery"]["status"], views.DOWN)
 
         # exception in the stats call
-        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+        with mock.patch('celery.app.control.inspect', autospec=True) as mocked:
             mocked.side_effect = IOError()
             resp = self.get(503)
         self.assertIn("celery", resp)
@@ -215,7 +215,7 @@ class TestStatus(TestCase):
         """
         Test that status_all is DOWN when another service is DOWN
         """
-        with mock.patch('celery.task.control.inspect', autospec=True) as mocked:
+        with mock.patch('celery.app.control.inspect', autospec=True) as mocked:
             mocked.return_value.stats.return_value = {}
             resp = self.get(503)
 
